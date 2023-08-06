@@ -20,7 +20,8 @@ namespace RecordAndReplayServices
             
             //in here set the return value as it was replayed.
             //get the return value by searching replayed call with the same arguments
-            var wasCallFound = _invocationContext.SearchCall(invocation,_serviceType,out var returnValue);
+            var wasCallFound = _invocationContext.SearchCall(invocation,_serviceType,
+                _invocationContext.ReplayOptions,out var returnValue);
 
             if (wasCallFound)
             {

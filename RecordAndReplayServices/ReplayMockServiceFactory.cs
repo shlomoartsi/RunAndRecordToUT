@@ -6,9 +6,10 @@ namespace RecordAndReplayServices
     {
         private readonly ReplayInvocationContext _context;
 
-        public ReplayMockServiceFactory(ReplayInvocationContext context)
+        public ReplayMockServiceFactory(ReplayInvocationContext context, ReplayOptions replayOptions = null)
         {
             _context = context;
+            _context.ReplayOptions = replayOptions ?? new ReplayOptions();
         }
 
         public TServiceInterface CreateReplayMock<TServiceInterface>() where TServiceInterface : class
