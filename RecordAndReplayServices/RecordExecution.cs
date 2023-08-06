@@ -1,13 +1,9 @@
-﻿using Castle.DynamicProxy;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Castle.DynamicProxy;
 
-namespace RunAndRecordToUT
+namespace RecordAndReplayServices
 {
 
     public class RecordExecution
@@ -34,7 +30,7 @@ namespace RunAndRecordToUT
 
         internal bool InterceptService<TServiceInterface>(TServiceInterface serviceImpl, out TServiceInterface serviceMock) where TServiceInterface : class
         {
-            var interceptor = new ClassInterceptor(_recordInvocations);
+            var interceptor = new ServiceInvocationRecordInterceptor(_recordInvocations,typeof(TServiceInterface));
             var proxyGenerator = new ProxyGenerator();
 
             // Create proxy for the service interface using the interceptor
@@ -75,6 +71,11 @@ namespace RunAndRecordToUT
 
             _recordInvocations.AddServiceToValidateCalledWithArgs<TServiceInterface>();
             recordedServiceCast.ValidateArgs= true;
+        }
+
+        public string ToJson()
+        {
+            return _recordInvocations.ToJson();
         }
 
         public void SaveToJson(string filePath)

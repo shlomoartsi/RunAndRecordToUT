@@ -1,4 +1,4 @@
-﻿namespace RunAndRecordToUT
+﻿namespace Test
 {
     public interface INumber<T> 
     {

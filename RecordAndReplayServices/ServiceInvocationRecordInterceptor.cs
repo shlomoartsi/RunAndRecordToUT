@@ -1,22 +1,25 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Castle.DynamicProxy;
 
-namespace RunAndRecordToUT
+namespace RecordAndReplayServices
 {
 
-    public class ClassInterceptor : IInterceptor
+    public class ServiceInvocationRecordInterceptor : IInterceptor
     {
         private readonly RecordInvocationContext _invocationContext;
+        private readonly Type _interfaceType;
 
-        public ClassInterceptor(RecordInvocationContext invocationContext)
+        public ServiceInvocationRecordInterceptor(RecordInvocationContext invocationContext,Type interfaceType)
         {
             _invocationContext = invocationContext;
+            _interfaceType = interfaceType;
         }
 
         public void Intercept(IInvocation invocation)
         {
             invocation.Proceed();
-            var context = new InvocationContext(invocation.TargetType.ToTypeInfo(),
+            var context = new InvocationContextRecordForRecord(_interfaceType.ToTypeInfo(),
                 invocation.Method.Name, invocation.Arguments,
                 invocation.Arguments.Select(arg => arg?.GetType().ToTypeInfo()).ToArray(),
                 null,null);
