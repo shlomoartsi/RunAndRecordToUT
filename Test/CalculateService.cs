@@ -42,6 +42,8 @@
 
         T Add<T>(INumber<T> a, INumber<T> b);
 
+        void Add(float a, float b, out float result);
+
         void SaveMemory(float a);
         float GetMemory();
         float Memory { get; }
@@ -53,6 +55,11 @@
         public T Add<T>(INumber<T> a, INumber<T> b)
         {
             return a.AddNumber(b);
+        }
+
+        public void Add(float a, float b, out float result)
+        {
+            result = a + b;
         }
 
         public void SaveMemory(float a) => Memory = a;

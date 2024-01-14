@@ -81,5 +81,40 @@ namespace Test
             Assert.AreEqual(result1, 8.2f);
             Assert.AreEqual(result2, 7.2f);
         }
+
+        [TestMethod]
+        public void TestRecordAndReplay_OutParamValue()
+        {
+            //arrange
+            var calculatorService = new CalculatorService();
+
+            var recordExecution = RecordExecutionBuilder.Create()
+                .AddServiceToRecord<ICalculatorService>(calculatorService, out var calculatorRecordMock)
+                .ValidateServiceReturnValue<ICalculatorService>()
+                .Build();
+
+            //act
+            // Intercept function calls and save arguments/return values
+            calculatorRecordMock.Add(3.4f,4.5f,out var _result);
+            calculatorRecordMock.Add(4f, 4f, out var _);
+
+            var json = recordExecution.ToJson();
+
+            var invocationContextFromJson = RecordInvocationContext.FromJson(json);
+
+            var replayContext = new ReplayInvocationContext(invocationContextFromJson);
+            var replayOptions = new ReplayOptions();
+            replayOptions.AddComparingParamsToService<ICalculatorService>();
+            var calculatorReplayMock = new ReplayMockServiceFactory(replayContext, replayOptions).
+                CreateReplayMock<ICalculatorService>();
+
+            //replay service in the reserve to real execution
+            calculatorReplayMock.Add(3.4f, 4.5f, out var result1);
+            calculatorReplayMock.Add(4f, 4f, out var result2);
+
+            //assert
+            Assert.AreEqual(result2, 8f);
+            Assert.AreEqual(result1, 7.9f);
+        }
     }
 }
