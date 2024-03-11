@@ -6,6 +6,8 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<NoWarn>Nu1803</NoWarn>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
