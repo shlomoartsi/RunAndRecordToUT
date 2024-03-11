@@ -4,14 +4,21 @@ namespace RecordAndReplayServices
 {
     public readonly struct TypeInfo
     {
+        [Flags]
         public enum TypeCompareOptions
         {
             /// <summary>
             /// Compare all fields
             /// </summary>
-            CompareAll,
+            CompareAll = 0,
             //Compare all fields with simplified assembly that ignores version and culture
-            CompareWithSimplifiedAssembly
+            CompareWithSimplifiedAssembly = 0b0001,
+            //Ignore out parameter
+            IgnoreOut = 0b0010,
+            //ignore ref parameter
+            IgnoreRef = 0b0100,
+            //Compare all fields with simplified assembly that ignores version and culture and ignore out parameter
+            CompareSimplified = CompareWithSimplifiedAssembly | IgnoreOut | IgnoreRef
         }
 
         public TypeInfo(string assemblyName,string @namespace,string name)
@@ -31,9 +38,10 @@ namespace RecordAndReplayServices
             return AssemblyName + ", " + FullName;
         }
 
-        public bool Equals(TypeInfo other, TypeCompareOptions compareOptions = TypeCompareOptions.CompareWithSimplifiedAssembly)
+        public bool Equals(TypeInfo other, 
+            TypeCompareOptions compareOptions = TypeCompareOptions.CompareSimplified)
         {
-            if (this.Namespace != other.Namespace || this.Name != other.Name) return false;
+            if (this.Namespace != other.Namespace || this.Name.Replace('&',' ').TrimEnd() != other.Name) return false;
 
             if (this.AssemblyName == other.AssemblyName) return true;
 

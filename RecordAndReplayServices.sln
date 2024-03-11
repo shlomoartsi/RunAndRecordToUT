@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordAndReplayServices", "RecordAndReplayServices\RecordAndReplayServices.csproj", "{0FE68107-AEF2-4178-BFA8-7113F7B0ACD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{50AC5019-1247-4984-99A6-5B836EC8226A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordAndReplayServices.Test", "RecordAndReplayServices.Test\RecordAndReplayServices.Test.csproj", "{50AC5019-1247-4984-99A6-5B836EC8226A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

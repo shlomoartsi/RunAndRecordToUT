@@ -1,8 +1,8 @@
-﻿namespace Test
+﻿namespace RecordAndReplayServices.Test
 {
-    public interface INumber<T> 
+    public interface INumber<T>
     {
-        T Value { get;  }
+        T Value { get; }
         T AddNumber(INumber<T> n);
     }
 

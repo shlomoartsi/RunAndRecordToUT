@@ -23,9 +23,10 @@ namespace RecordAndReplayServices
             }
         }
 
-        public bool SearchCall(IInvocation invocation,Type serviceType,ReplayOptions replayOptions,out object returnValue)
+        public bool SearchCall(IInvocation invocation,Type serviceType,
+            ReplayOptions replayOptions,out InvocationContextRecordForReplay invocationRecordContext)
         {
-            returnValue = null;
+            invocationRecordContext = null;
             var found = false;
             foreach (var invocationRecord in ValidateInvocationContext)
             {
@@ -33,7 +34,7 @@ namespace RecordAndReplayServices
                     invocationRecord.InstanceInterface.Equals(serviceType.ToTypeInfo()) &&
                     CompareArguments(invocation, invocationRecord, replayOptions))
                 {
-                    returnValue = invocationRecord.ReturnValue;
+                    invocationRecordContext = invocationRecord;
                     if (!invocationRecord.AlreadyUsedReturnValue)
                     {
                         invocationRecord.AlreadyUsedReturnValue = true;
@@ -62,14 +63,26 @@ namespace RecordAndReplayServices
                 replayOptions.ContainsMethod(invocationContextRecord.InstanceInterface,
                     invocationContextRecord.FunctionName))
             {
+                //create new invocation arguments and invocationContextRecord arguments without the out parameters
+                var invocationArgumentsFiltered = new List<object>();
+                var invocationContextRecordArgumentsFiltered = new List<object>();
+                for (var i = 0; i < invocation.Arguments.Length; i++)
+                {
+                    if (invocation.Method.GetParameters()[i].IsOut) continue;
+                    invocationArgumentsFiltered.Add(invocation.Arguments[i]);
+                    invocationContextRecordArgumentsFiltered.Add(invocationContextRecord.CallArguments[i]);
+                }
+
+                if (invocationArgumentsFiltered.Count == 0) return true;
+
+
                 var settings = new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
                 };
 
-                //Compare arguments values
-                var paramsInRecord = invocationContextRecord.ActualCallArgumentsAsJson;
-                var paramsInInvocation = JsonConvert.SerializeObject(invocation.Arguments, settings);
+                var paramsInRecord = JsonConvert.SerializeObject(invocationContextRecordArgumentsFiltered, settings);
+                var paramsInInvocation = JsonConvert.SerializeObject(invocationArgumentsFiltered, settings);
                 return paramsInRecord == paramsInInvocation;
             }
 

@@ -21,22 +21,40 @@ namespace RecordAndReplayServices
             //in here set the return value as it was replayed.
             //get the return value by searching replayed call with the same arguments
             var wasCallFound = _invocationContext.SearchCall(invocation,_serviceType,
-                _invocationContext.ReplayOptions,out var returnValue);
+                _invocationContext.ReplayOptions,out var invocationContextRecord);
 
             if (wasCallFound)
             {
-                if (returnValue == null)
+
+                //fill out variable with the return value
+                var methodParameters = invocation.Method.GetParameters();
+                for (var i = 0; i < methodParameters.Length; i++)
+                {
+                    if (!methodParameters[i].IsOut && !methodParameters[i].ParameterType.IsByRef) continue;
+                    if (invocationContextRecord.CallArguments[i].GetType() == methodParameters[i].ParameterType)
+                    {
+                        invocation.Arguments[i] = invocationContextRecord.CallArguments[i];
+                    }
+                    else
+                    {
+                        invocation.Arguments[i] = Convert.ChangeType(invocationContextRecord.CallArguments[i],
+                            methodParameters[i].ParameterType.GetElementType());
+                    }
+                }
+
+                if (invocationContextRecord.ReturnValue == null)
                 {
                     return;
                 }
 
-                if (invocation.Method.ReturnType == returnValue.GetType())
+                if (invocation.Method.ReturnType == invocationContextRecord.ReturnValue.GetType())
                 {
-                    invocation.ReturnValue = returnValue;
+                    invocation.ReturnValue = invocationContextRecord.ReturnValue;
                 }
                 else
                 {
-                    invocation.ReturnValue = Convert.ChangeType(returnValue, invocation.Method.ReturnType);
+                    invocation.ReturnValue = Convert.ChangeType(invocationContextRecord.ReturnValue,
+                        invocation.Method.ReturnType);
                 }
             }
             else
@@ -45,5 +63,6 @@ namespace RecordAndReplayServices
                     "Can not execute method, no recorded data corresponds to arguments");
             }
         }
+
     }
 }

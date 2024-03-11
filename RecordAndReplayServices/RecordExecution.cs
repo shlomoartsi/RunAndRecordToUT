@@ -16,7 +16,6 @@ namespace RecordAndReplayServices
             }
             internal TServiceInterface Service { get; }
             internal bool ValidateArgs { get; set; }
-            internal bool ValidateReturnValue { get; set; }
         }
 
         private readonly ConcurrentDictionary<Type, object> _servicesCollection;
@@ -35,26 +34,10 @@ namespace RecordAndReplayServices
 
             // Create proxy for the service interface using the interceptor
             serviceMock =
-                proxyGenerator.CreateInterfaceProxyWithTarget<TServiceInterface>(serviceImpl, interceptor);
+                proxyGenerator.CreateInterfaceProxyWithTarget(serviceImpl, interceptor);
 
             return _servicesCollection.TryAdd(typeof(TServiceInterface),
                 new RecordedService<TServiceInterface>(serviceMock));
-        }
-
-        public void AddServiceToValidateReturnValue<TServiceInterface>()
-        {
-            if (!_servicesCollection.TryGetValue(typeof(TServiceInterface), out var recordService))
-            {
-                throw new ApplicationException($"Service {typeof(TServiceInterface)} is not added to record");
-            }
-
-            if (!(recordService is RecordedService<TServiceInterface> recordedServiceCast))
-            {
-                throw new ApplicationException("Internal error, added incorrect service to internal dictionary");
-            }
-
-            _recordInvocations.AddServiceToValidateReturnValue<TServiceInterface>();
-            recordedServiceCast.ValidateReturnValue = true;
         }
 
         public void AddServiceToValidateCalledWithArgs<TServiceInterface>()

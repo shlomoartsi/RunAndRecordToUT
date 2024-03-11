@@ -26,18 +26,6 @@ namespace RecordAndReplayServices
             return this;
         }
 
-        public RecordExecutionBuilder ValidateServiceReturnValue<TServiceInterface>()
-        {
-            _recordExecution.AddServiceToValidateReturnValue<TServiceInterface>();
-            return this;
-        }
-
-        public RecordExecutionBuilder ValidateServiceCalledWithArgs<TServiceInterface>()
-        {
-            _recordExecution.AddServiceToValidateCalledWithArgs<TServiceInterface>();
-            return this;
-        }
-
         public RecordExecution Build()
         {
             return _recordExecution;
